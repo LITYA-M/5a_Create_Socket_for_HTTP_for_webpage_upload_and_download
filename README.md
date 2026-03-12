@@ -16,6 +16,109 @@ To write a PYTHON program for socket for HTTP for web page upload and download
 6.Stop the program
 <BR>
 ## Program 
+server.py
+
+```
+import socket
+
+s = socket.socket()
+s.bind(("localhost",8080))
+s.listen(1)
+
+print("Server running...")
+
+while True:
+    c,addr = s.accept()
+    
+    request = c.recv(1024).decode()
+    print("Request received")
+
+    if "GET" in request:
+        f = open("index.html","r")
+        data = f.read()
+        f.close()
+
+        response = "HTTP/1.1 200 OK\n\n" + data
+        c.send(response.encode())
+
+    elif "POST" in request:
+        data = request.split("\n\n")[1]
+
+        f = open("upload.txt","w")
+        f.write(data)
+        f.close()
+
+        c.send("HTTP/1.1 200 OK\n\nFile Uploaded".encode())
+
+    c.close()
+```
+client.py
+```
+import socket
+
+s = socket.socket()
+s.connect(("localhost",8080))
+
+ch = input("1.Download 2.Upload : ")
+
+if ch == "1":
+    req = "GET / HTTP/1.1\nHost: localhost\n\n"
+    s.send(req.encode())
+
+    data = s.recv(4096)
+    print(data.decode())
+
+else:
+    msg = input("Enter data to upload: ")
+
+    req = "POST / HTTP/1.1\nHost: localhost\n\n" + msg
+    s.send(req.encode())
+
+    data = s.recv(1024)
+    print(data.decode())
+
+s.close()
+```
+index.html
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome Page</title>
+</head>
+<body>
+    <h1>Welcome to the Python HTTP Server!</h1>
+    <p>This is the default page served by the server.</p>
+    <p>Have a nice day.</p>
+
+</body>
+</html>
+```
+
+
+
 ## OUTPUT
+
+server.py:
+
+<img width="783" height="82" alt="Screenshot 2026-03-12 100655" src="https://github.com/user-attachments/assets/bb02688d-5fa4-40bb-93f6-7ad5c6150f38" />
+
+client.py:
+
+<img width="812" height="428" alt="Screenshot 2026-03-12 100647" src="https://github.com/user-attachments/assets/6448235f-50b6-4760-b40b-aaad9ca97eee" />
+
+server.py:
+
+<img width="783" height="82" alt="Screenshot 2026-03-12 100655" src="https://github.com/user-attachments/assets/71889bfd-bfdc-49b2-8a6f-5a251f90ac53" />
+
+client.py:
+
+<img width="810" height="161" alt="Screenshot 2026-03-12 100800" src="https://github.com/user-attachments/assets/033cb82c-ac59-4e05-8fcd-48ec01ce2694" />
+
+
+
+
 ## Result
 Thus the socket for HTTP for web page upload and download created and Executed
